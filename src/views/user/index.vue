@@ -52,19 +52,15 @@
     <!-- 表格数据区域 -->
     <el-card class="table-wrapper">
       <el-table :data="data" size="small">
-        <el-table-column prop="date" label="手机号"> </el-table-column>
-        <el-table-column prop="name" label="昵称"> </el-table-column>
-        <el-table-column prop="address" label="头像"> </el-table-column>
-        <el-table-column prop="date" label="余额"> </el-table-column>
-        <el-table-column prop="name" label="翠豆余额"> </el-table-column>
-        <el-table-column prop="address" label="经验"> </el-table-column>
-        <el-table-column prop="date" label="认证状态"> </el-table-column>
-        <el-table-column prop="name" label="用户类型"> </el-table-column>
-        <el-table-column prop="address" label="上次登录ip"> </el-table-column>
-        <el-table-column prop="date" label="上次登录时间"> </el-table-column>
-        <el-table-column prop="name" label="注册设备ip"> </el-table-column>
-        <el-table-column prop="address" label="创建时间"> </el-table-column>
-        <el-table-column prop="address" label="状态"> </el-table-column>
+        <el-table-column prop="username" label="用户名"> </el-table-column>
+        <el-table-column prop="role.roleName" label="角色"> </el-table-column>
+        <el-table-column prop="org.orgName" label="所属组织"> </el-table-column>
+        <el-table-column prop="phone" label="手机号"> </el-table-column>
+        <el-table-column prop="name" label="姓名"> </el-table-column>
+        <el-table-column prop="sex" label="性别"> </el-table-column>
+        <el-table-column prop="birthday" label="生日"> </el-table-column>
+        <el-table-column prop="address" label="地址"> </el-table-column>
+        <el-table-column prop="idcard" label="身份证号"> </el-table-column>
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
             <el-button
@@ -94,61 +90,38 @@ export default {
     return {
       filterForm: {
         account: "",
-        name: "",
-        user_class: 1,
-        date_range: null, //*
-        start_time: null,
         end_time: null
       },
-      data: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄"
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄"
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄"
-        }
-      ]
+      pageSize: 10,
+      pageNum: 1,
+      data: []
     };
   },
   created() {},
   mounted() {
-    GetUserList().then(res => {
-      console.log(res);
-    });
+    this.getData();
   },
   computed: {},
   methods: {
-    /**
-     * 日期范围选择器change时间，参数为一个数组，包含两个元素：起始时间和结束时间
-     */
+    async getData() {
+      const res = await GetUserList({
+        pageSize: this.pageSize,
+        pageNum: this.pageNum
+      });
+      console.log(res);
+      this.data = res.data.list;
+    },
     filterDateChange(val) {
       this.filterForm.start_time = parseTime(val[0], `{y}-{m}-{d}`);
       this.filterForm.end_time = parseTime(val[1], `{y}-{m}-{d}`);
     },
-    //筛选区域表单提交
     onFilterSubmit() {},
-    //筛选区域表单重置
     onFilterReset() {
       this.filterForm = Object.keys(this.filterForm).reduce((p, v) => {
         p[v] = null;
         return p;
       }, {});
     },
-
     rowEdit(row) {
       console.log(row);
     },

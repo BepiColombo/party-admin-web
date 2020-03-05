@@ -50,6 +50,7 @@
                     v-model="formLogin.password"
                     type="password"
                     placeholder="密码"
+                    @keyup.enter.native="submit"
                   >
                     <template slot="prepend"
                       ><i class="el-icon-lock"
@@ -62,6 +63,7 @@
                   class="button-login"
                   type="primary"
                   @click="submit"
+                  :loading="isLoading"
                 >
                   登录
                 </el-button>
@@ -132,6 +134,7 @@
                   class="button-login"
                   type="primary"
                   @click="registsSubmit"
+                  :loading="isLoading"
                 >
                   注册
                 </el-button>
@@ -184,10 +187,11 @@ export default {
       isLoginFormShow: true,
       // 表单
       formLogin: {
-        username: "",
-        password: ""
+        username: "admin",
+        password: "123456"
       },
       formRegists: {},
+      isLoading: false,
       // 表单校验
       rules: {
         username: [
@@ -239,11 +243,13 @@ export default {
           this.$refs.registsForm.resetFields();
         }
       } finally {
+        this.isLoading = false;
         this.isLoginFormShow = !this.isLoginFormShow;
       }
     },
     // 提交登录信息
     submit() {
+      this.isLoading = true;
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
           // 登录
@@ -260,10 +266,15 @@ export default {
             );
             await this.$store.dispatch("permission/generateRoutes", menus);
             // dynamically add accessible routes
-
+            this.$notify({
+              title: "成功",
+              message: "登录成功",
+              type: "success"
+            });
             this.$router.replace("/dashboard");
           } catch (e) {
-            console.log(e);
+          } finally {
+            this.isLoading = false;
           }
         } else {
           // 登录表单校验失败
@@ -272,21 +283,28 @@ export default {
       });
     },
     registsSubmit() {
+      this.isLoading = true;
       this.$refs.registsForm.validate(async valid => {
         if (!valid) return;
-        const res = await regists(this.formRegists);
-        if (res.code === 200) {
-          this.$notify({
-            title: "成功",
-            message: "注册成功",
-            type: "success"
-          });
-          this.$store.commit("user/SET_TOKEN", res.data.token);
-          await this.$store.dispatch(
-            "permission/generateRoutes",
-            res.data.menus
-          );
-          this.$router.replace("/dashboard");
+        try {
+          const res = await regists(this.formRegists);
+          if (res.code === 200) {
+            this.$notify({
+              title: "成功",
+              message: "注册成功",
+              type: "success"
+            });
+            this.$store.commit("user/SET_TOKEN", res.data.token);
+            await this.$store.dispatch(
+              "permission/generateRoutes",
+              res.data.menus
+            );
+
+            this.$router.replace("/dashboard");
+          }
+        } catch (e) {
+        } finally {
+          this.isLoading = false;
         }
       });
     }

@@ -81,20 +81,6 @@ class Request {
               duration: 5 * 1000
             });
 
-            // MessageBox.confirm(
-            //   msg,
-            //   "确认",
-            //   {
-            //     confirmButtonText: "Re-Login",
-            //     cancelButtonText: "Cancel",
-            //     type: "warning"
-            //   }
-            // ).then(() => {
-            //   // store.dispatch("user/resetToken").then(() => {
-            //   //   location.reload();
-            //   // });
-            //   location.reload();
-            // });
             return Promise.reject(new Error(res.message || "Error"));
           } else {
             return res;
@@ -122,9 +108,7 @@ class Request {
           ...config
         }
       });
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) {}
   }
 
   async delete(url, params, config) {
@@ -135,9 +119,7 @@ class Request {
           ...config
         }
       });
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (e) {}
   }
 
   async put(url, data, config) {
@@ -147,14 +129,11 @@ class Request {
           ...config
         }
       });
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (e) {}
   }
 
   async get(url, params, config) {
     // let signParams = parameterSign(parmas);
-    console.log(this);
     try {
       return await this.service.get(url, {
         params,
@@ -162,9 +141,7 @@ class Request {
           ...config
         }
       });
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) {}
   }
 }
 

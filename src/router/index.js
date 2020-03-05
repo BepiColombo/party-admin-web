@@ -109,7 +109,7 @@ export const asyncRoutes = [
     meta: {
       title: "用户管理",
       icon: "dashboard",
-      affix: true,
+      affix: false,
       perms: "user:view"
     },
     children: [
@@ -120,7 +120,7 @@ export const asyncRoutes = [
         meta: {
           title: "用户列表",
           icon: "dashboard",
-          affix: true,
+          affix: false,
           perms: "user:view"
         }
       }
