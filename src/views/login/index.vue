@@ -93,11 +93,11 @@
                   >
                   </el-input>
                 </el-form-item>
-                <el-form-item prop="name" label="姓名">
+                <el-form-item prop="nickname" label="昵称">
                   <el-input
-                    v-model="formRegists.name"
+                    v-model="formRegists.nickname"
                     type="text"
-                    placeholder="姓名"
+                    placeholder="昵称"
                   >
                   </el-input>
                 </el-form-item>
@@ -236,16 +236,16 @@ export default {
       this.time = dayjs().format("HH:mm:ss");
     },
     toggleRegistLogin() {
-      // try {
-      //   if (this.isLoginFormShow) {
-      //     this.$refs.loginForm.resetFields();
-      //   } else {
-      //     this.$refs.registsForm.resetFields();
-      //   }
-      // } finally {
-      //   this.isLoading = false;
-      //   this.isLoginFormShow = !this.isLoginFormShow;
-      // }
+      try {
+        if (this.isLoginFormShow) {
+          this.$refs.loginForm.resetFields();
+        } else {
+          this.$refs.registsForm.resetFields();
+        }
+      } finally {
+        this.isLoading = false;
+        this.isLoginFormShow = !this.isLoginFormShow;
+      }
     },
     // 提交登录信息
     submit() {

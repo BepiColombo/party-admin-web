@@ -95,7 +95,7 @@ export const asyncRoutes = [
         component: () => import("@/views/dashboard/index"),
         name: "Dashboard",
         meta: {
-          title: "首页",
+          title: "概览",
           icon: "dashboard",
           affix: true,
           perms: "dashboard"
@@ -106,6 +106,7 @@ export const asyncRoutes = [
   {
     path: "/user",
     component: Layout,
+    redirect: "list",
     meta: {
       title: "用户管理",
       icon: "dashboard",
@@ -114,7 +115,7 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: "/list",
+        path: "list",
         component: () => import("@/views/user/index"),
         name: "User",
         meta: {

@@ -58,7 +58,6 @@ class Request {
        */
       response => {
         const res = response.data;
-        console.log(response);
         // if the custom code is not 20000, it is judged as an error.
         if (res.code !== ResponseCode.SUCCESS) {
           if (
