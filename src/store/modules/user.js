@@ -79,7 +79,7 @@ const actions = {
       logout(state.token)
         .then(() => {
           commit("SET_TOKEN", "");
-          commit("SET_ROLES", []);
+          commit("SET_PERMS", []);
           removeToken();
           resetRouter();
 
@@ -99,7 +99,7 @@ const actions = {
   resetToken({ commit }) {
     return new Promise(resolve => {
       commit("SET_TOKEN", "");
-      commit("SET_ROLES", []);
+      commit("SET_PERMS", []);
       removeToken();
       resolve();
     });

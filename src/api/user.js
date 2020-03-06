@@ -6,5 +6,5 @@ const USER_PREFIX = "/user";
  * @param {*} data
  */
 export function GetUserList(params) {
-  return request.get(USER_PREFIX + "/getUserList", params);
+  return request.post(USER_PREFIX + "/getUserList", params);
 }

@@ -1,6 +1,5 @@
 import router from "./router";
 import store from "./store";
-import { Message } from "element-ui";
 import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
 import { getToken } from "@/utils/storage"; // get token from cookie
@@ -34,14 +33,10 @@ router.beforeEach(async (to, from, next) => {
         try {
           // console.log("router permission try:");
           // get user info
-          // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { menus } = await store.dispatch("user/getInfo");
 
           // generate accessible routes map based on roles
           await store.dispatch("permission/generateRoutes", menus);
-
-          // // dynamically add accessible routes
-          // router.addRoutes(accessRoutes);
 
           // hack method to ensure that addRoutes is complete
           // set the replace: true, so the navigation will not leave a history record
@@ -51,8 +46,8 @@ router.beforeEach(async (to, from, next) => {
           // console.log("router permission err:", error);
           // remove token and go to login page to re-login
           await store.dispatch("user/resetToken");
-          Message.error(error || "Has Error");
-          next(`/login?redirect=${to.path}`);
+          // next(`/login?redirect=${to.path}`);
+          next(`/login`);
         } finally {
           NProgress.done();
         }
@@ -66,7 +61,7 @@ router.beforeEach(async (to, from, next) => {
       next();
     } else {
       // other pages that do not have permission to access are redirected to the login page.
-      next(`/login?redirect=${to.path}`);
+      next(`/login`);
       NProgress.done();
     }
     next();

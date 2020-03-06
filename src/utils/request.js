@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Message } from "element-ui";
 import store from "@/store";
+import router from "@/router";
 import { getToken } from "@/utils/storage";
 import { ResponseCode } from "@/constants";
 import qs from "qs";
@@ -57,34 +58,32 @@ class Request {
        */
       response => {
         const res = response.data;
-        if (response.status === 401) {
-          Message({
-            message: "没有权限",
-            type: "error",
-            duration: 5 * 1000
-          });
-        } else {
-          // if the custom code is not 20000, it is judged as an error.
-          if (res.code !== ResponseCode.SUCCESS) {
-            let msg = res.msg;
-            // if (res.code === ResponseCode.TOKEN_EXPIRED ) {
-            //   // to re-login
-            //  msg = "登录已失效"
-            // }else if(res.code === ResponseCode.TOKEN_INVALID){
-            //   msg = "token验证失败"
-            // }else if(ResponseCode.AUTH_ERR) {
-            //   msg = "token为空"
-            // }
+        console.log(response);
+        // if the custom code is not 20000, it is judged as an error.
+        if (res.code !== ResponseCode.SUCCESS) {
+          if (
+            res.code === ResponseCode.UNAUTHORIZED ||
+            res.code === ResponseCode.TOKEN_EXPIRED ||
+            res.code === ResponseCode.TOKEN_INVALID ||
+            res.code === ResponseCode.AUTH_ERR
+          ) {
+            router.push("/login");
             Message({
-              message: msg || "Error",
+              message: "登录信息出错，请重新登录",
+              type: "warning",
+              duration: 5 * 1000
+            });
+            return Promise.reject(new Error(res.msg || "权限出错"));
+          } else {
+            Message({
+              message: "请求出错",
               type: "error",
               duration: 5 * 1000
             });
-
-            return Promise.reject(new Error(res.message || "Error"));
-          } else {
-            return res;
+            return Promise.reject(new Error(res.msg || "请求出错"));
           }
+        } else {
+          return res;
         }
       },
       error => {

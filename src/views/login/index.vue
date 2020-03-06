@@ -236,16 +236,16 @@ export default {
       this.time = dayjs().format("HH:mm:ss");
     },
     toggleRegistLogin() {
-      try {
-        if (this.isLoginFormShow) {
-          this.$refs.loginForm.resetFields();
-        } else {
-          this.$refs.registsForm.resetFields();
-        }
-      } finally {
-        this.isLoading = false;
-        this.isLoginFormShow = !this.isLoginFormShow;
-      }
+      // try {
+      //   if (this.isLoginFormShow) {
+      //     this.$refs.loginForm.resetFields();
+      //   } else {
+      //     this.$refs.registsForm.resetFields();
+      //   }
+      // } finally {
+      //   this.isLoading = false;
+      //   this.isLoginFormShow = !this.isLoginFormShow;
+      // }
     },
     // 提交登录信息
     submit() {

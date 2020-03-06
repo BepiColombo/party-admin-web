@@ -3,25 +3,24 @@
     <!-- 筛选-操作区域 -->
     <div class="filter-wrapper">
       <el-form :inline="true" :model="filterForm" class="filter-form">
-        <el-form-item label="手机号">
+        <el-form-item label="搜索">
           <el-input
-            v-model="filterForm.account"
-            placeholder="手机号"
+            v-model="filterForm.keyword"
+            placeholder="请输入手机号或用户名或昵称搜索"
           ></el-input>
         </el-form-item>
-        <el-form-item label="昵称">
-          <el-input v-model="filterForm.name" placeholder="昵称"></el-input>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="filterForm.user_class" placeholder="状态">
+
+        <el-form-item label="角色类型">
+          <el-select v-model="filterForm.roleType" placeholder="请选择角色类型">
             <el-option label="用户" :value="1"></el-option>
             <el-option label="管理员" :value="2"></el-option>
+            <el-option label="超级管理员" :value="3"></el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item label="注册时间">
           <el-date-picker
-            v-model="filterForm.date_range"
+            v-model="filterForm.birthday"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -31,7 +30,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="success" icon="el-icon-search" @click="onFilterReset"
+          <el-button type="success" icon="el-icon-search" @click="getData"
             >搜索</el-button
           >
           <el-button
@@ -51,17 +50,19 @@
 
     <!-- 表格数据区域 -->
     <el-card class="table-wrapper">
-      <el-table :data="data" size="small">
+      <el-table :data="data" size="small" v-loading="isLoading">
         <el-table-column prop="username" label="用户名"> </el-table-column>
         <el-table-column prop="role.roleName" label="角色"> </el-table-column>
         <el-table-column prop="org.orgName" label="所属组织"> </el-table-column>
         <el-table-column prop="phone" label="手机号"> </el-table-column>
-        <el-table-column prop="name" label="姓名"> </el-table-column>
+        <el-table-column prop="nickname" label="姓名"> </el-table-column>
         <el-table-column prop="sex" label="性别"> </el-table-column>
         <el-table-column prop="birthday" label="生日"> </el-table-column>
         <el-table-column prop="address" label="地址"> </el-table-column>
         <el-table-column prop="idcard" label="身份证号"> </el-table-column>
-        <el-table-column fixed="right" label="操作">
+        <el-table-column prop="createTime" label="创建时间"> </el-table-column>
+        <el-table-column prop="updateTime" label="更新时间"> </el-table-column>
+        <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button
               type="primary"
@@ -89,9 +90,12 @@ export default {
   data() {
     return {
       filterForm: {
-        account: "",
+        keyword: "",
+        roleType: null,
+        start_time: null,
         end_time: null
       },
+      isLoading: false,
       pageSize: 10,
       pageNum: 1,
       data: []
@@ -104,12 +108,21 @@ export default {
   computed: {},
   methods: {
     async getData() {
-      const res = await GetUserList({
-        pageSize: this.pageSize,
-        pageNum: this.pageNum
-      });
-      console.log(res);
-      this.data = res.data.list;
+      console.log(this.filterForm);
+      this.isLoading = true;
+      try {
+        const res = await GetUserList({
+          pageSize: this.pageSize,
+          pageNum: this.pageNum,
+          keyword: this.filterForm.keyword,
+          roleType: this.filterForm.roleType,
+          startTime: this.filterForm.start_time,
+          endTime: this.filterForm.end_time
+        });
+        this.data = res.data.list;
+      } finally {
+        this.isLoading = false;
+      }
     },
     filterDateChange(val) {
       this.filterForm.start_time = parseTime(val[0], `{y}-{m}-{d}`);
