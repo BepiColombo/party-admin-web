@@ -7,6 +7,7 @@ import md5 from "md5";
  * @returns {string | null}
  */
 export function parseTime(time, cFormat) {
+  console.log(time)
   if (arguments.length === 0) {
     return null;
   }

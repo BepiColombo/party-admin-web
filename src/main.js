@@ -20,6 +20,9 @@ import "./permission"; // permission control
 import "./utils/error-log"; // error log
 
 import * as filters from "./filters"; // global filters
+import format from "./mixins/format";
+
+Vue.mixin(format);
 
 Vue.use(Element, {
   size: Cookies.get("size") || "small" // set element-ui default size

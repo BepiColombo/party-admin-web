@@ -120,6 +120,13 @@ aside {
   }
 }
 
+::-webkit-scrollbar {
+  width: 7px; /*对垂直流动条有效*/
+  height: 7px; /*对水平流动条有效*/
+  border-radius: 4px;
+  background: rgba(144,147,153,.3);
+}
+
 //main-container全局样式
 .app-container {
   padding: 20px;

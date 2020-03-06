@@ -3,25 +3,32 @@
     <!-- 筛选-操作区域 -->
     <div class="filter-wrapper">
       <el-form :inline="true" :model="filterForm" class="filter-form">
-        <el-form-item label="搜索">
+        <el-form-item>
           <el-input
             v-model="filterForm.keyword"
             placeholder="请输入手机号或用户名或昵称搜索"
+            class="keyword-input"
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="角色类型">
-          <el-select v-model="filterForm.roleType" placeholder="请选择角色类型">
+        <el-form-item>
+          <el-select
+            v-model="filterForm.roleType"
+            placeholder="请选择角色类型"
+            class="roleType-sel"
+          >
             <el-option label="用户" :value="1"></el-option>
             <el-option label="管理员" :value="2"></el-option>
             <el-option label="超级管理员" :value="3"></el-option>
           </el-select>
         </el-form-item>
 
-        <el-form-item label="注册时间">
+        <el-form-item>
           <el-date-picker
+            class="datePicker"
             v-model="filterForm.birthday"
             type="daterange"
+            placeholder="请选择注册日期范围"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
@@ -56,12 +63,24 @@
         <el-table-column prop="org.orgName" label="所属组织"> </el-table-column>
         <el-table-column prop="phone" label="手机号"> </el-table-column>
         <el-table-column prop="nickname" label="姓名"> </el-table-column>
-        <el-table-column prop="sex" label="性别"> </el-table-column>
-        <el-table-column prop="birthday" label="生日"> </el-table-column>
+        <el-table-column prop="sex" label="性别" :formatter="sexFormat">
+        </el-table-column>
+        <el-table-column prop="birthday" label="生日" :formatter="dateFormat">
+        </el-table-column>
         <el-table-column prop="address" label="地址"> </el-table-column>
         <el-table-column prop="idcard" label="身份证号"> </el-table-column>
-        <el-table-column prop="createTime" label="创建时间"> </el-table-column>
-        <el-table-column prop="updateTime" label="更新时间"> </el-table-column>
+        <el-table-column
+          prop="createTime"
+          label="创建时间"
+          :formatter="dateYearFormat"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="updateTime"
+          label="更新时间"
+          :formatter="dateYearFormat"
+        >
+        </el-table-column>
         <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button
@@ -144,3 +163,21 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.user-container {
+  .filter-wrapper {
+    .filter-form {
+      .keyword-input {
+        width: 200px;
+      }
+      .roleType-sel {
+        width: 138px;
+      }
+      .datePicker {
+        width: 200px;
+      }
+    }
+  }
+}
+</style>
