@@ -1,101 +1,57 @@
+<!--分页-->
 <template>
-  <div :class="{ hidden: hidden }" class="pagination-container">
-    <el-pagination
-      :background="background"
-      :current-page.sync="currentPage"
-      :page-size.sync="pageSize"
-      :layout="layout"
-      :page-sizes="pageSizes"
-      :total="total"
-      v-bind="$attrs"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
-  </div>
+  <el-pagination
+    :page-size.sync="_pageSize"
+    :total="total"
+    :current-page.sync="_pageNum"
+    style="margin-top: 8px;"
+    :page-sizes="[10, 15, 20]"
+    layout="total, prev, pager, next, sizes"
+    @size-change="sizeChangeHandler"
+    @current-change="pageChangeHandler"
+  />
 </template>
-
 <script>
-import { scrollTo } from "@/utils/scroll-to";
-
 export default {
-  name: "Pagination",
   props: {
+    pageNum: {
+      type: Number,
+      default: () => 1
+    },
+    pageSize: {
+      type: Number,
+      default: () => 10
+    },
     total: {
-      required: true,
-      type: Number
-    },
-    page: {
       type: Number,
-      default: 1
-    },
-    limit: {
-      type: Number,
-      default: 20
-    },
-    pageSizes: {
-      type: Array,
-      default() {
-        return [10, 20, 30, 50];
-      }
-    },
-    layout: {
-      type: String,
-      default: "total, sizes, prev, pager, next, jumper"
-    },
-    background: {
-      type: Boolean,
-      default: true
-    },
-    autoScroll: {
-      type: Boolean,
-      default: true
-    },
-    hidden: {
-      type: Boolean,
-      default: false
+      required: true
     }
   },
   computed: {
-    currentPage: {
-      get() {
-        return this.page;
-      },
+    _pageNum: {
       set(val) {
-        this.$emit("update:page", val);
+        this.$emit("update:pageNum", val);
+      },
+      get() {
+        return this.pageNum;
       }
     },
-    pageSize: {
-      get() {
-        return this.limit;
-      },
+    _pageSize: {
       set(val) {
-        this.$emit("update:limit", val);
+        this.$emit("update:pageSize", val);
+      },
+      get() {
+        return this.pageSize;
       }
     }
   },
   methods: {
-    handleSizeChange(val) {
-      this.$emit("pagination", { page: this.currentPage, limit: val });
-      if (this.autoScroll) {
-        scrollTo(0, 800);
-      }
+    sizeChangeHandler(val) {
+      this.$emit("sizeChange", val);
     },
-    handleCurrentChange(val) {
-      this.$emit("pagination", { page: val, limit: this.pageSize });
-      if (this.autoScroll) {
-        scrollTo(0, 800);
-      }
+    pageChangeHandler(val) {
+      this.$emit("pageChange", val);
     }
   }
 };
 </script>
-
-<style scoped>
-.pagination-container {
-  background: #fff;
-  padding: 32px 16px;
-}
-.pagination-container.hidden {
-  display: none;
-}
-</style>

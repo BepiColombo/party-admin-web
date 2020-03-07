@@ -13,13 +13,19 @@
 
         <el-form-item>
           <el-select
+            clearable
+            @visible-change="getRoleListData"
             v-model="filterForm.roleType"
             placeholder="请选择角色类型"
             class="roleType-sel"
           >
-            <el-option label="用户" :value="1"></el-option>
-            <el-option label="管理员" :value="2"></el-option>
-            <el-option label="超级管理员" :value="3"></el-option>
+            <el-option
+              v-for="item in roleOptionList"
+              :key="item.roleId"
+              :label="item.roleName"
+              :value="item.roleId"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
 
@@ -49,9 +55,9 @@
         </el-form-item>
       </el-form>
       <div class="action-wrapper">
-        <el-button type="primary" icon="el-icon-plus" @click="onFilterSubmit"
+        <!-- <el-button type="primary" icon="el-icon-plus" @click="onFilterSubmit"
           >新增</el-button
-        >
+        > -->
       </div>
     </div>
 
@@ -68,7 +74,16 @@
         <el-table-column prop="birthday" label="生日" :formatter="dateFormat">
         </el-table-column>
         <el-table-column prop="address" label="地址"> </el-table-column>
-        <el-table-column prop="idcard" label="身份证号"> </el-table-column>
+        <el-table-column prop="isValid" label="状态">
+          <template slot-scope="scope">
+            <el-tag type="success" v-if="scope.row.isValid == 1">
+              正常
+            </el-tag>
+            <el-tag type="danger" v-if="scope.row.isValid == 0">
+              禁用
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column
           prop="createTime"
           label="创建时间"
@@ -86,26 +101,67 @@
             <el-button
               type="primary"
               icon="el-icon-edit"
-              @click="rowEdit(scope)"
+              @click="rowEdit(scope.row)"
             ></el-button>
             <el-button
               type="danger"
               icon="el-icon-delete"
-              @click="rowDelete(scope)"
+              @click="rowDelete(scope.row)"
             ></el-button>
           </template>
         </el-table-column>
       </el-table>
+      <Pagination
+        :total="total"
+        :page-size="pageSize"
+        :page-num="pageNum"
+        @sizeChange="onSizeChange"
+        @pageChange="onPageChange"
+      />
     </el-card>
+
+    <el-dialog title="编辑用户信息" :visible.sync="isDialogShow">
+      <el-form :model="userEditForm" class="edit-form">
+        <el-form-item label="昵称">
+          {{ userEditForm.nickname }}
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio v-model="userEditForm.isValid" :label="1">启用</el-radio>
+          <el-radio v-model="userEditForm.isValid" :label="0">禁用</el-radio>
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select
+            @visible-change="getRoleListData"
+            v-model="userEditForm.role.roleId"
+            clearable
+            placeholder="请选择角色"
+          >
+            <el-option
+              v-for="item in roleOptionList"
+              :key="item.roleId"
+              :label="item.roleName"
+              :value="item.roleId"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isDialogShow = false">取 消</el-button>
+        <el-button type="primary" @click="editSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { parseTime } from "@/utils";
-import { GetUserList } from "@/api/user";
+import Pagination from "@/components/Pagination";
+import { GetRoleList } from "@/api/role";
+import { GetUserList, DeleteUser, UpdateUser } from "@/api/user";
 export default {
   name: "User",
-  components: {},
+  components: { Pagination },
   data() {
     return {
       filterForm: {
@@ -117,17 +173,23 @@ export default {
       isLoading: false,
       pageSize: 10,
       pageNum: 1,
-      data: []
+      total: 0,
+      data: [],
+      isDialogShow: false,
+      userEditForm: {
+        role: {}
+      },
+      roleOptionList: []
     };
   },
   created() {},
   mounted() {
     this.getData();
+    this.getRoleListData();
   },
   computed: {},
   methods: {
     async getData() {
-      console.log(this.filterForm);
       this.isLoading = true;
       try {
         const res = await GetUserList({
@@ -139,9 +201,22 @@ export default {
           endTime: this.filterForm.end_time
         });
         this.data = res.data.list;
+        this.total = res.data.total;
       } finally {
         this.isLoading = false;
       }
+    },
+    async getRoleListData() {
+      const res = await GetRoleList();
+      this.roleOptionList = res.data;
+    },
+    onSizeChange(val) {
+      this.pageSize = val;
+      this.getData();
+    },
+    onPageChange(val) {
+      this.pageNum = val;
+      this.getData();
     },
     filterDateChange(val) {
       this.filterForm.start_time = parseTime(val[0], `{y}-{m}-{d}`);
@@ -155,10 +230,50 @@ export default {
       }, {});
     },
     rowEdit(row) {
-      console.log(row);
+      this.isDialogShow = true;
+      this.$nextTick(() => {
+        this.userEditForm = {
+          ...row
+        };
+      });
+    },
+    async editSubmit() {
+      this.isLoading = true;
+      try {
+        const res = await UpdateUser(this.userEditForm);
+        if (res.code == 200) {
+          this.$message.success("更新成功");
+          this.isDialogShow = false;
+        } else {
+          this.$message.warning("更新失败");
+        }
+      } catch (error) {
+      } finally {
+        this.isLoading = false;
+      }
     },
     rowDelete(row) {
-      console.log(row);
+      this.$confirm("此操作将删除该用户, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          this.isLoading = true;
+          try {
+            const res = await DeleteUser(row.userId);
+            if (res.code == 200) {
+              this.$message.success("删除成功");
+              this.getData();
+            } else {
+              this.$message.warning("删除失败");
+            }
+          } catch (e) {
+          } finally {
+            this.isLoading = false;
+          }
+        })
+        .catch(() => {});
     }
   }
 };
@@ -178,6 +293,11 @@ export default {
         width: 200px;
       }
     }
+  }
+
+  .edit-form {
+    width: 400px;
+    margin: auto;
   }
 }
 </style>
