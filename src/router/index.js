@@ -119,10 +119,44 @@ export const asyncRoutes = [
         component: () => import("@/views/user/index"),
         name: "User",
         meta: {
-          title: "用户列表",
+          title: "用户管理",
           icon: "dashboard",
           affix: false,
           perms: "user:view"
+        }
+      }
+    ]
+  },
+  {
+    path: "/auth",
+    component: Layout,
+    redirect: "role",
+    meta: {
+      title: "权限管理",
+      icon: "dashboard",
+      affix: false
+    },
+    children: [
+      {
+        path: "role",
+        component: () => import("@/views/auth/role/index"),
+        name: "Role",
+        meta: {
+          title: "角色管理",
+          icon: "dashboard",
+          affix: false,
+          perms: "role:view"
+        }
+      },
+      {
+        path: "menu",
+        component: () => import("@/views/auth/menu/index"),
+        name: "Menu",
+        meta: {
+          title: "菜单管理",
+          icon: "dashboard",
+          affix: false,
+          perms: "menu:view"
         }
       }
     ]

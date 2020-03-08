@@ -4,9 +4,7 @@ import router, { resetRouter } from "@/router";
 
 const state = {
   token: getToken(),
-  name: "",
-  avatar: "",
-  introduction: "",
+  userInfo: "",
   perms: []
 };
 
@@ -15,17 +13,11 @@ const mutations = {
     state.token = token;
     setToken(token);
   },
-  SET_INTRODUCTION: (state, introduction) => {
-    state.introduction = introduction;
-  },
-  SET_NAME: (state, name) => {
-    state.name = name;
-  },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar;
-  },
   SET_PERMS: (state, perms) => {
     state.perms = perms;
+  },
+  SET_USERINFO: (state, userInfo) => {
+    state.userInfo = userInfo;
   }
 };
 
@@ -58,13 +50,14 @@ const actions = {
             reject("Verification failed, please Login again.");
           }
 
-          const { menus } = data;
+          const { menus, userInfo } = data;
           let perms = menus.reduce((p, v) => {
             p.push(v.perms);
             return p;
           }, []);
 
           commit("SET_PERMS", perms);
+          commit("SET_USERINFO", userInfo);
           resolve(data);
         })
         .catch(error => {

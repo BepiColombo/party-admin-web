@@ -13,8 +13,8 @@ export function GetUserList(params) {
  * 更新用户
  * @param {*} user
  */
-export function UpdateUser(user) {
-  return request.post(USER_PREFIX + "/updateUser", user);
+export function UpdateUserByManager(user) {
+  return request.post(USER_PREFIX + "/updateUserByManager", user);
 }
 
 /**

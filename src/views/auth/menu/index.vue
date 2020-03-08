@@ -1,5 +1,5 @@
 <template>
-  <div class="user-container">
+  <div class="role-container">
     <!-- 筛选-操作区域 -->
     <div class="filter-wrapper">
       <el-form :inline="true" :model="filterForm" class="filter-form">
@@ -62,9 +62,6 @@
 
     <!-- 表格数据区域 -->
     <el-card class="table-wrapper">
-      <div slot="header" class="clearfix">
-        <span>用户列表</span>
-      </div>
       <el-table :data="data" size="small" v-loading="isLoading">
         <el-table-column prop="username" label="用户名"> </el-table-column>
         <el-table-column prop="role.roleName" label="角色"> </el-table-column>
@@ -125,17 +122,17 @@
     </el-card>
 
     <el-dialog title="编辑用户" :visible.sync="isDialogShow">
-      <el-form :model="editForm" class="edit-form">
+      <el-form :model="userEditForm" class="edit-form">
         <el-form-item label="昵称">
-          {{ editForm.nickname }}
+          {{ userEditForm.nickname }}
         </el-form-item>
         <el-form-item label="状态">
-          <el-radio v-model="editForm.isValid" :label="1">启用</el-radio>
-          <el-radio v-model="editForm.isValid" :label="0">禁用</el-radio>
+          <el-radio v-model="userEditForm.isValid" :label="1">启用</el-radio>
+          <el-radio v-model="userEditForm.isValid" :label="0">禁用</el-radio>
         </el-form-item>
         <el-form-item label="角色">
           <el-select
-            v-model="editForm.role.roleId"
+            v-model="userEditForm.role.roleId"
             clearable
             placeholder="请选择角色"
           >
@@ -180,7 +177,7 @@ export default {
       total: 0,
       data: [],
       isDialogShow: false,
-      editForm: {
+      userEditForm: {
         role: {}
       },
       roleOptionList: []
@@ -240,7 +237,7 @@ export default {
     rowEdit(row) {
       this.isDialogShow = true;
       this.$nextTick(() => {
-        this.editForm = {
+        this.userEditForm = {
           ...row
         };
       });
@@ -249,9 +246,9 @@ export default {
       this.isLoading = true;
       try {
         const res = await UpdateUserByManager({
-          userId: this.editForm.userId,
-          roleId: this.editForm.role.roleId,
-          isValid: this.editForm.isValid
+          userId: this.userEditForm.userId,
+          roleId: this.userEditForm.role.roleId,
+          isValid: this.userEditForm.isValid
         });
         if (res.code == 200) {
           this.$message.success("更新成功");
@@ -294,7 +291,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.user-container {
+.role-container {
   .filter-wrapper {
     .filter-form {
       .keyword-input {
