@@ -63,3 +63,19 @@ export function UpdateMenu(menu) {
 export function AddMenu(menu) {
   return request.post(MENU_PREFIX + "/addMenu", menu);
 }
+
+/**
+ * 更新角色-菜单
+ * @param {*} ids
+ */
+export function UpdateRoleMenus(ids) {
+  return request.post(ROLE_PREFIX + "/batchRoleMenuAction", ids);
+}
+
+/**
+ * 获取某一角色的菜单
+ * @param {*} roleId
+ */
+export function GetMenusOfRole(roleId) {
+  return request.get(ROLE_PREFIX + "/getMenusOfRole", roleId);
+}

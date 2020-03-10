@@ -19,11 +19,15 @@ import "./icons"; // icon
 import "./permission"; // permission control
 import "./utils/error-log"; // error log
 
+// 权限指令
+import permission from "./directive/permission";
+
 import * as filters from "./filters"; // global filters
 import format from "./mixins/format";
 
 Vue.mixin(format);
 
+Vue.use(permission);
 Vue.use(Element, {
   size: Cookies.get("size") || "small" // set element-ui default size
 });

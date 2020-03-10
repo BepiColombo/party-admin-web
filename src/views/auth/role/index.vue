@@ -51,7 +51,21 @@
         <el-card class="table-wrapper">
           <div slot="header" class="clearfix">
             <span>菜单分配</span>
+            <el-select
+              v-model="cur_role"
+              placeholder="请选择角色"
+              class="role-selector"
+            >
+              <el-option
+                v-for="item in data"
+                :key="item.roleId"
+                :label="item.roleName"
+                :value="item.roleId"
+              >
+              </el-option>
+            </el-select>
             <el-button
+              v-permission="perms.roleMenuAdd"
               style="float: right"
               type="primary"
               icon="el-icon-check"
@@ -60,6 +74,7 @@
             >
           </div>
           <el-tree
+            v-loading="isMenuTreeLoading"
             :data="menuList"
             :props="props"
             show-checkbox
@@ -89,6 +104,7 @@
 <script>
 import { parseTime } from "@/utils";
 import { translateDataToTree } from "@/utils/tree";
+import { UpdateRoleMenus, GetMenusOfRole } from "@/api/roleMenu";
 import {
   GetRoleList,
   DeleteRoleById,
@@ -102,9 +118,14 @@ export default {
   data() {
     return {
       isLoading: false,
+      isMenuTreeLoading: false,
       data: [],
       isDialogShow: false,
       editForm: {},
+      perms: {
+        roleMenuAdd: ["role:menu:batch"]
+      },
+      cur_role: null,
       props: {
         label: "menuName",
         children: "children"
@@ -118,11 +139,28 @@ export default {
     this.getData();
   },
   computed: {},
+  watch: {
+    async cur_role(val) {
+      this.isMenuTreeLoading = true;
+
+      try {
+        const res = await GetMenusOfRole({ roleId: val });
+        const menu_ids = res.data.reduce((p, v) => {
+          p.push(v.menuId);
+          return p;
+        }, []);
+        this.$refs.menuTree.setCheckedKeys(menu_ids);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.isMenuTreeLoading = false;
+      }
+    }
+  },
   methods: {
     handleCheckChange(data, checked, indeterminate) {
       console.log(data, checked, indeterminate);
     },
-
     async getData() {
       this.isLoading = true;
       try {
@@ -145,9 +183,18 @@ export default {
     onAddRoleClick() {
       this.isDialogShow = true;
     },
-    menuSubmit() {
+    async menuSubmit() {
       const keys = this.$refs.menuTree.getCheckedKeys();
-      console.log(keys);
+      if (this.cur_role === null || this.cur_role === undefined) {
+        this.$message.warning("请先选择角色");
+        return;
+      }
+      const res = await UpdateRoleMenus({ ids: keys, roleId: this.cur_role });
+      if (res.code == 200) {
+        this.$message.success("分配成功");
+      } else {
+        this.$message.warning("分配失败");
+      }
     },
     rowEdit(row) {
       this.isDialogShow = true;
@@ -175,7 +222,7 @@ export default {
       }
     },
     rowDelete(row) {
-      this.$confirm("此操作将删除该用户, 是否继续?", "提示", {
+      this.$confirm("此操作将删除该角色, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -206,6 +253,10 @@ export default {
   .edit-form {
     width: 400px;
     margin: auto;
+  }
+  .role-selector {
+    margin-left: 10px;
+    width: 160px;
   }
 }
 </style>
