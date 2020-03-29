@@ -316,10 +316,10 @@ export default {
       }
     },
     addCancel() {
+      this.$refs.addForm.resetFields();
       this.isDialogShow = false;
       this.stepNum = 1;
       this.addForm = {};
-      this.$refs.addForm.resetFields();
     },
     async editSubmit() {
       this.isLoading = true;
