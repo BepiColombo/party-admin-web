@@ -15,6 +15,14 @@ export function getInfo(token) {
 }
 
 /**
+ * 更新用户资料
+ * @param {*} user
+ */
+export function updateProfile(user) {
+  return request.post("/updateProfile", user);
+}
+
+/**
  * 注册
  */
 export function regists(user) {

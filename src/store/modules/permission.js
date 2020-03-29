@@ -7,7 +7,11 @@ import router, { asyncRoutes, constantRoutes } from "@/router";
  */
 function hasPermission(perms, route) {
   if (route.meta && route.meta.perms) {
-    return perms.includes(route.meta.perms);
+    if (Array.isArray(route.meta.perms)) {
+      return perms.find(item => route.meta.perms.includes(item));
+    } else {
+      return perms.includes(route.meta.perms);
+    }
   } else {
     return true;
   }

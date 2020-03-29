@@ -31,13 +31,13 @@
         trigger="click"
       >
         <div class="avatar-wrapper">
-          <img
-            src="https://www.gravatar.com/avatar/ccae6cda4f2f114a1d3b0d1b0a94a648?s=180&d=identicon"
-            class="user-avatar"
-          />
+          <img :src="userInfo.avatar || defaultAvatar" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item divided @click.native="modifyProfile">
+            <span style="display:block;">修改资料</span>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
           </el-dropdown-item>
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
 import ErrorLog from "@/components/ErrorLog";
@@ -56,7 +56,7 @@ import Screenfull from "@/components/Screenfull";
 import SizeSelect from "@/components/SizeSelect";
 import Search from "@/components/HeaderSearch";
 import ThemePicker from "@/components/ThemePicker";
-
+import { defaultAvatar } from "@/constants";
 export default {
   components: {
     Breadcrumb,
@@ -67,7 +67,15 @@ export default {
     Search,
     ThemePicker
   },
+  data() {
+    return {
+      defaultAvatar
+    };
+  },
   computed: {
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    }),
     ...mapGetters(["sidebar", "avatar", "device"])
   },
   methods: {
@@ -80,6 +88,9 @@ export default {
     async logout() {
       await this.$store.dispatch("user/logout");
       this.$router.push(`/login`);
+    },
+    modifyProfile() {
+      this.$router.push(`/profile/modify`);
     }
   }
 };

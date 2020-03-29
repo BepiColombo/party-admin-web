@@ -277,6 +277,23 @@ export function debounce(func, wait, immediate) {
 }
 
 /**
+ * 节流
+ * @param {*} fn
+ * @param {*} interval
+ */
+export function throttle(fn, interval = 300) {
+  let canRun = true;
+  return function() {
+    if (!canRun) return;
+    canRun = false;
+    setTimeout(() => {
+      fn.apply(this, arguments);
+      canRun = true;
+    }, interval);
+  };
+}
+
+/**
  * This is just a simple version of deep copy
  * Has a lot of edge cases bug
  * If you want to use a perfect deep copy, use lodash's _.cloneDeep

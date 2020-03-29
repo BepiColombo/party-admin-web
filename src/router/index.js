@@ -96,9 +96,71 @@ export const asyncRoutes = [
         name: "Dashboard",
         meta: {
           title: "概览",
-          icon: "dashboard",
+          icon: "data",
           affix: true,
           perms: "dashboard"
+        }
+      }
+    ]
+  },
+  {
+    path: "/profile",
+    component: Layout,
+    redirect: "modify",
+    children: [
+      {
+        path: "modify",
+        component: () => import("@/views/modify_profile"),
+        name: "ProfileModify",
+        meta: {
+          title: "修改资料"
+        }
+      }
+    ],
+    hidden: true
+  },
+  {
+    path: "/article",
+    component: Layout,
+    redirect: "article",
+    meta: {
+      title: "文章管理",
+      icon: "suggest",
+      affix: false
+    },
+    children: [
+      {
+        path: "article",
+        component: () => import("@/views/article/index"),
+        name: "Article",
+        meta: {
+          title: "文章管理",
+          icon: "suggest",
+          affix: false,
+          perms: "article:view"
+        }
+      },
+      {
+        path: "article_edit",
+        component: () => import("@/views/article/edit"),
+        name: "ArticleEdit",
+        hidden: true,
+        meta: {
+          title: "编辑文章",
+          icon: "suggest",
+          affix: false,
+          perms: ["article:update", "article:add"]
+        }
+      },
+      {
+        path: "article_detail",
+        component: () => import("@/views/article/detail"),
+        name: "ArticleDetail",
+        hidden: true,
+        meta: {
+          title: "文章详情",
+          icon: "suggest",
+          affix: false
         }
       }
     ]
@@ -109,7 +171,7 @@ export const asyncRoutes = [
     redirect: "list",
     meta: {
       title: "用户管理",
-      icon: "dashboard",
+      icon: "user-center",
       affix: false,
       perms: "user:view"
     },
@@ -120,7 +182,7 @@ export const asyncRoutes = [
         name: "User",
         meta: {
           title: "用户管理",
-          icon: "dashboard",
+          icon: "user-center",
           affix: false,
           perms: "user:view"
         }
@@ -133,8 +195,9 @@ export const asyncRoutes = [
     redirect: "role",
     meta: {
       title: "权限管理",
-      icon: "dashboard",
-      affix: false
+      icon: "guanliyuan",
+      affix: false,
+      perms: "role:view"
     },
     children: [
       {
@@ -143,7 +206,7 @@ export const asyncRoutes = [
         name: "Role",
         meta: {
           title: "角色管理",
-          icon: "dashboard",
+          icon: "Customer management",
           affix: false,
           perms: "role:view"
         }
@@ -154,13 +217,38 @@ export const asyncRoutes = [
         name: "Menu",
         meta: {
           title: "菜单管理",
-          icon: "dashboard",
+          icon: "category",
           affix: false,
           perms: "menu:view"
         }
       }
     ]
   },
+  {
+    path: "/org",
+    component: Layout,
+    redirect: "org",
+    meta: {
+      title: "组织管理",
+      icon: "connections",
+      affix: false,
+      perms: "org:view"
+    },
+    children: [
+      {
+        path: "org",
+        component: () => import("@/views/org/index"),
+        name: "Org",
+        meta: {
+          title: "组织管理",
+          icon: "connections",
+          affix: false,
+          perms: "org:view"
+        }
+      }
+    ]
+  },
+
   // 404 page must be placed at the end !!!
   { path: "*", redirect: "/404", hidden: true }
 ];

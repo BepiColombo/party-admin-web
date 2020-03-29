@@ -86,15 +86,82 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="编辑角色" :visible.sync="isDialogShow">
+    <el-dialog
+      title="新增角色"
+      :visible.sync="isDialogShow"
+      @close="addCancel"
+      class="add-dialog"
+      :close-on-click-modal="false"
+    >
+      <el-steps
+        :space="200"
+        :active="stepNum"
+        :align-center="true"
+        class="steps"
+      >
+        <el-step title="角色信息"></el-step>
+        <el-step title="分配菜单"></el-step>
+      </el-steps>
+      <transition name="fade-transform" mode="out-in">
+        <el-form
+          :model="addForm"
+          class="add-form"
+          :rules="rules"
+          ref="addForm"
+          v-if="stepNum == 1"
+        >
+          <el-form-item label="角色名" prop="roleName">
+            <el-input
+              v-model="addForm.roleName"
+              placeholder="请输入角色名"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="角色描述" prop="roleDescription">
+            <el-input
+              v-model="addForm.roleDescription"
+              placeholder="请输入角色描述"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+
+        <el-tree
+          v-else
+          :data="menuList"
+          :props="props"
+          show-checkbox
+          node-key="menuId"
+          ref="roleAddMenuTree"
+        >
+        </el-tree>
+      </transition>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addCancel">取 消</el-button>
+        <el-button type="primary" @click="addNext">下一步</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+      title="编辑角色"
+      :visible.sync="isEditDialogShow"
+      :close-on-click-modal="false"
+    >
       <el-form :model="editForm" class="edit-form">
         <el-form-item label="角色名">
-          <el-radio v-model="editForm.isValid" :label="1">启用</el-radio>
-          <el-radio v-model="editForm.isValid" :label="0">禁用</el-radio>
+          <el-input
+            v-model="editForm.roleName"
+            placeholder="请输入角色名"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述">
+          <el-input
+            v-model="editForm.roleDescription"
+            placeholder="请输入角色描述"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isDialogShow = false">取 消</el-button>
+        <el-button @click="isEditDialogShow = false">取 消</el-button>
         <el-button type="primary" @click="editSubmit">确 定</el-button>
       </div>
     </el-dialog>
@@ -104,13 +171,14 @@
 <script>
 import { parseTime } from "@/utils";
 import { translateDataToTree } from "@/utils/tree";
-import { UpdateRoleMenus, GetMenusOfRole } from "@/api/roleMenu";
 import {
   GetRoleList,
   DeleteRoleById,
   UpdateRole,
   AddRole,
-  GetMenuList
+  GetMenuList,
+  GetMenusOfRole,
+  UpdateRoleMenus
 } from "@/api/roleMenu";
 export default {
   name: "Role",
@@ -121,7 +189,26 @@ export default {
       isMenuTreeLoading: false,
       data: [],
       isDialogShow: false,
+      isEditDialogShow: false,
       editForm: {},
+      addForm: {},
+      stepNum: 1,
+      rules: {
+        roleName: [
+          {
+            required: true,
+            message: "请输入角色名",
+            trigger: "blur"
+          }
+        ],
+        roleDescription: [
+          {
+            required: true,
+            message: "请输入角色描述",
+            trigger: "blur"
+          }
+        ]
+      },
       perms: {
         roleMenuAdd: ["role:menu:batch"]
       },
@@ -197,21 +284,51 @@ export default {
       }
     },
     rowEdit(row) {
-      this.isDialogShow = true;
+      this.isEditDialogShow = true;
       this.$nextTick(() => {
         this.editForm = {
           ...row
         };
       });
     },
+    async addNext() {
+      if (this.stepNum == 1) {
+        this.$refs.addForm.validate(valid => {
+          if (valid) {
+            this.stepNum++;
+          }
+        });
+      } else {
+        const selectKeys = this.$refs.roleAddMenuTree.getCheckedKeys();
+        const res = await AddRole({
+          roleName: this.addForm.roleName,
+          roleDescription: this.addForm.roleDescription,
+          menuIds: selectKeys.toString()
+        });
+        if (res.code == 200) {
+          this.$message.success("添加成功");
+          //清空状态
+          this.addCancel();
+          this.getData();
+        } else {
+          this.$message.warning(res.msg);
+        }
+      }
+    },
+    addCancel() {
+      this.isDialogShow = false;
+      this.stepNum = 1;
+      this.addForm = {};
+      this.$refs.addForm.resetFields();
+    },
     async editSubmit() {
       this.isLoading = true;
       try {
-        const res = await UpdateRole({});
+        const res = await UpdateRole(this.editForm);
         if (res.code == 200) {
           this.$message.success("更新成功");
           this.getData();
-          this.isDialogShow = false;
+          this.isEditDialogShow = false;
         } else {
           this.$message.warning("更新失败");
         }
@@ -230,7 +347,7 @@ export default {
         .then(async () => {
           this.isLoading = true;
           try {
-            const res = await DeleteRoleById(row.userId);
+            const res = await DeleteRoleById(row.roleId);
             if (res.code == 200) {
               this.$message.success("删除成功");
               this.getData();
@@ -257,6 +374,17 @@ export default {
   .role-selector {
     margin-left: 10px;
     width: 160px;
+  }
+
+  .add-dialog {
+    width: 1000px;
+    margin: auto;
+    .steps {
+      margin-bottom: 20px;
+    }
+    /deep/ .el-dialog__body {
+      min-height: 350px;
+    }
   }
 }
 </style>

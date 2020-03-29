@@ -148,6 +148,22 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item>
+          <el-upload
+            class="upload-demo"
+            :http-request="onUpload"
+            action="localhost:8080/user/upload"
+            :limit="1"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">
+              只能上传jpg/png文件，且不超过500kb
+            </div>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <img :src="imgUrl" alt="" style="width:120px;" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isDialogShow = false">取 消</el-button>
@@ -162,6 +178,7 @@ import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination";
 import { GetRoleList } from "@/api/roleMenu";
 import { GetUserList, DeleteUser, UpdateUserByManager } from "@/api/user";
+import { Upload } from "@/api/common";
 import { mapState } from "vuex";
 export default {
   name: "User",
@@ -174,6 +191,7 @@ export default {
         start_time: null,
         end_time: null
       },
+      imgUrl: "",
       isLoading: false,
       pageSize: 10,
       pageNum: 1,
@@ -213,6 +231,13 @@ export default {
       } finally {
         this.isLoading = false;
       }
+    },
+    async onUpload(raw) {
+      const file = raw.file;
+      let formData = new FormData();
+      formData.append("file", file);
+      const res = await Upload(formData);
+      this.imgUrl = res.data;
     },
     async getRoleListData() {
       const res = await GetRoleList();

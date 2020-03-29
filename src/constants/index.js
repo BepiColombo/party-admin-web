@@ -17,3 +17,6 @@ export const ResponseCode = {
   UPDATE_ACTION_FAIL: 500005,
   UPDATE_ACTION_SUCCESS: 500006
 };
+
+export const defaultAvatar =
+  "https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1618065806,14298536&fm=26&gp=0.jpg";
